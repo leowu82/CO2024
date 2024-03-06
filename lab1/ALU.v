@@ -9,6 +9,20 @@ module ALU (
 
     // TODO: implement your ALU here
     // Hint: you can use operator to implement
+
+    always @(ALUctl) begin
+        case (ALUctl)
+            // ADD
+            4'b0010: ALUOut <= A + B;
+            // SUB
+            4'b0110: ALUOut <= A + (~B + 1);
+            // AND
+            4'b0000: ALUOut <= A & B;
+            // OR
+            4'b0001: ALUOut <= A | B;
+            default: ALUOut <= 0;
+        endcase
+    end
     
 endmodule
 

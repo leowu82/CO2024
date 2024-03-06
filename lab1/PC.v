@@ -6,7 +6,10 @@ module PC (
 );
 
     // TODO: implement your program counter here
-
+    always @(posedge clk, negedge rst) begin
+        if (~rst) pc_o = 0;
+        else pc_o = pc_i;
+    end
 
 endmodule
 
