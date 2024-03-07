@@ -9,6 +9,8 @@ module Mux2to1 #(
 );
     // TODO: implement your 2to1 multiplexer here
 
+    if (~sel) assign out = s0;
+    else assign out = s1;
     
 endmodule
 
