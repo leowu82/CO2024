@@ -11,49 +11,57 @@ module SingleCycleCPU (
 // The following provides simple template,
 // you can modify it as you wish except I/O pin and register module
 
+wire [31:0] pc_curr;
+wire [31:0] pc_next;
 PC m_PC(
-    .clk(),
+    .clk(clk),
     .rst(start),
-    .pc_i(),
-    .pc_o()
+    .pc_i(pc_curr),
+    .pc_o(pc_next)
 );
 
+// pc add 4
+wire [31:0] pc_mult0;
 Adder m_Adder_1(
-    .a(),
-    .b(),
-    .sum()
+    .a(pc_next),
+    .b(4),
+    .sum(pc_mult0)
 );
 
+wire [31:0] inst;
 InstructionMemory m_InstMem(
-    .readAddr(),
-    .inst()
+    .readAddr(pc_next),
+    .inst(inst)
 );
 
+wire branch, memRead, memtoReg, memWrite, ALUSrc, regWrite;
+wire [1:0] ALUOp;
 Control m_Control(
-    .opcode(),
-    .branch(),
-    .memRead(),
-    .memtoReg(),
-    .ALUOp(),
-    .memWrite(),
-    .ALUSrc(),
-    .regWrite()
+    .opcode(inst[6:0]),
+    .branch(branch),
+    .memRead(memRead),
+    .memtoReg(memtoReg),
+    .ALUOp(ALUOp),
+    .memWrite(memWrite),
+    .ALUSrc(ALUSrc),
+    .regWrite(regWrite)
 );
 
 // For Student: 
 // Do not change the Register instance name!
 // Or you will fail validation.
 
+wire [31:0] writeData, readData1, readData2;
 Register m_Register(
-    .clk(),
+    .clk(clk),
     .rst(start),
-    .regWrite(),
-    .readReg1(),
-    .readReg2(),
-    .writeReg(),
-    .writeData(),
-    .readData1(),
-    .readData2()
+    .regWrite(regWrite),
+    .readReg1(inst[19:15]),
+    .readReg2(inst[24:20]),
+    .writeReg(inst[11: 7]),
+    .writeData(writeData),
+    .readData1(readData1),
+    .readData2(readData2)
 );
 
 // ======= for validation ======= 
@@ -61,66 +69,74 @@ Register m_Register(
 assign r = m_Register.regs;
 // ======= for vaildation =======
 
+wire [31:0] imm;
 ImmGen m_ImmGen(
-    .inst(),
-    .imm()
+    .inst(inst),
+    .imm(imm)
 );
 
+wire [31:0] sl1;
 ShiftLeftOne m_ShiftLeftOne(
-    .i(),
-    .o()
+    .i(imm),
+    .o(sl1)
 );
 
+wire [31:0] pc_mult1;
 Adder m_Adder_2(
-    .a(),
-    .b(),
-    .sum()
+    .a(pc_next),
+    .b(sl1),
+    .sum(pc_mult1)
 );
 
+wire zero;
 Mux2to1 #(.size(32)) m_Mux_PC(
-    .sel(),
-    .s0(),
-    .s1(),
-    .out()
+    .sel(branch && zero),
+    .s0(pc_mult0),
+    .s1(pc_mult1),
+    .out(pc_curr)
 );
 
+wire [31:0] ALU_B;
 Mux2to1 #(.size(32)) m_Mux_ALU(
-    .sel(),
-    .s0(),
-    .s1(),
-    .out()
+    .sel(ALUSrc),
+    .s0(readData2),
+    .s1(imm),
+    .out(ALU_B)
 );
 
+wire [3:0] ALUCtl;
 ALUCtrl m_ALUCtrl(
-    .ALUOp(),
-    .funct7(),
-    .funct3(),
-    .ALUCtl()
+    .ALUOp(ALUOp),
+    .funct7(isnt[30]),
+    .funct3(inst[14:12]),
+    .ALUCtl(ALUCtl)
 );
 
+wire [31:0] ALUOut;
 ALU m_ALU(
-    .ALUctl(),
-    .A(),
-    .B(),
-    .ALUOut(),
-    .zero()
+    .ALUctl(ALUCtl),
+    .A(readData1),
+    .B(ALU_B),
+    .ALUOut(ALUOut),
+    .zero(zero)
 );
 
+wire [31:0] readData;
 DataMemory m_DataMemory(
     .rst(start),
-    .clk(),
-    .memWrite(),
-    .memRead(),
-    .address(),
-    .writeData(),
-    .readData()
+    .clk(clk),
+    .memWrite(memWrite),
+    .memRead(memRead),
+    .address(ALUOut),
+    .writeData(readData2),
+    .readData(readData)
 );
 
 Mux2to1 #(.size(32)) m_Mux_WriteData(
-    .sel(),
-    .s0(),
-    .s1(),
-    .out()
+    .sel(memtoReg),
+    .s0(ALUOut),
+    .s1(readData),
+    .out(writeData)
 );
 
 endmodule
