@@ -19,6 +19,7 @@ module ImmGen (
             7'b0100011: imm <= {{21{inst[31]}}, inst[30:25], inst[11:7]};
             // i-type
             7'b0010011: imm <= {{21{inst[31]}}, inst[30:20]};
+            default: imm <= 0;
         endcase
     end
 
