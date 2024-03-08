@@ -107,7 +107,7 @@ Mux2to1 #(.size(32)) m_Mux_ALU(
 wire [3:0] ALUCtl;
 ALUCtrl m_ALUCtrl(
     .ALUOp(ALUOp),
-    .funct7(isnt[30]),
+    .funct7(inst[30]),
     .funct3(inst[14:12]),
     .ALUCtl(ALUCtl)
 );
