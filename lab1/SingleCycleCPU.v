@@ -24,7 +24,7 @@ PC m_PC(
 wire [31:0] pc_mult0;
 Adder m_Adder_1(
     .a(pc_next),
-    .b(4),
+    .b(32'sb100),
     .sum(pc_mult0)
 );
 
