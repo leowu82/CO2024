@@ -1,7 +1,8 @@
-.PHONY: SingleCycleCPU
-SingleCycleCPU:
+.PHONY: part1
+part1:
 	make clean
-	verilator --build ./SingleCycleCPU.v --exe ./example_testbench.cpp -cc --trace -Wall
+	verilator -Wall --cc SingleCycleCPU.v --exe example_testbench.cpp --trace
+	make -C obj_dir -f VSingleCycleCPU.mk VSingleCycleCPU
 	./obj_dir/VSingleCycleCPU
 
 .PHONY: clean
