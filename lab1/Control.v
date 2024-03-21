@@ -11,7 +11,7 @@ module Control (
 
     // TODO: implement your Control here
     // Hint: follow the Architecture (figure in spec) to set output signal
-    always @(opcode) begin
+    always @(*) begin
         case(opcode)
             // R-type
             7'b0110011: begin
@@ -55,7 +55,18 @@ module Control (
                 memWrite = 0;
                 branch   = 1;
                 ALUOp[1] = 0;
-                ALUOp[0] = 0;
+                ALUOp[0] = 1;
+            end
+            // I-type
+            7'b0010011: begin
+                ALUSrc   = 1;
+                memtoReg = 0;
+                regWrite = 1;
+                memRead  = 0;
+                memWrite = 0;
+                branch   = 0;
+                ALUOp[1] = 1;
+                ALUOp[0] = 1;
             end
             default: begin
                 ALUSrc   = 0;

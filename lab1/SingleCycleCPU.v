@@ -16,21 +16,21 @@ wire [31:0] pc_next;
 PC m_PC(
     .clk(clk),
     .rst(start),
-    .pc_i(pc_curr),
-    .pc_o(pc_next)
+    .pc_i(pc_next),
+    .pc_o(pc_curr)
 );
 
 // pc add 4
 wire [31:0] pc_mult0;
 Adder m_Adder_1(
-    .a(pc_next),
-    .b(32'sb100),
+    .a(pc_curr),
+    .b(4),
     .sum(pc_mult0)
 );
 
 wire [31:0] inst;
 InstructionMemory m_InstMem(
-    .readAddr(pc_next),
+    .readAddr(pc_curr),
     .inst(inst)
 );
 
@@ -51,7 +51,7 @@ Control m_Control(
 // Do not change the Register instance name!
 // Or you will fail validation.
 
-wire [31:0] writeData, readData1, readData2;
+wire [31:0] writeDataa, RD1, RD2;
 Register m_Register(
     .clk(clk),
     .rst(start),
@@ -59,9 +59,9 @@ Register m_Register(
     .readReg1(inst[19:15]),
     .readReg2(inst[24:20]),
     .writeReg(inst[11: 7]),
-    .writeData(writeData),
-    .readData1(readData1),
-    .readData2(readData2)
+    .writeData(writeDataa),
+    .readData1(RD1),
+    .readData2(RD2)
 );
 
 // ======= for validation ======= 
@@ -83,7 +83,7 @@ ShiftLeftOne m_ShiftLeftOne(
 
 wire [31:0] pc_mult1;
 Adder m_Adder_2(
-    .a(pc_next),
+    .a(pc_curr),
     .b(sl1),
     .sum(pc_mult1)
 );
@@ -93,13 +93,13 @@ Mux2to1 #(.size(32)) m_Mux_PC(
     .sel(branch && zero),
     .s0(pc_mult0),
     .s1(pc_mult1),
-    .out(pc_curr)
+    .out(pc_next)
 );
 
 wire [31:0] ALU_B;
 Mux2to1 #(.size(32)) m_Mux_ALU(
     .sel(ALUSrc),
-    .s0(readData2),
+    .s0(RD2),
     .s1(imm),
     .out(ALU_B)
 );
@@ -115,7 +115,7 @@ ALUCtrl m_ALUCtrl(
 wire [31:0] ALUOut;
 ALU m_ALU(
     .ALUctl(ALUCtl),
-    .A(readData1),
+    .A(RD1),
     .B(ALU_B),
     .ALUOut(ALUOut),
     .zero(zero)
@@ -128,7 +128,7 @@ DataMemory m_DataMemory(
     .memWrite(memWrite),
     .memRead(memRead),
     .address(ALUOut),
-    .writeData(readData2),
+    .writeData(RD2),
     .readData(readData)
 );
 
@@ -136,7 +136,7 @@ Mux2to1 #(.size(32)) m_Mux_WriteData(
     .sel(memtoReg),
     .s0(ALUOut),
     .s1(readData),
-    .out(writeData)
+    .out(writeDataa)
 );
 
 endmodule
