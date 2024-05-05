@@ -21,11 +21,11 @@ PC m_PC(
 );
 
 // pc add 4
-wire [31:0] pc_mult0;
+wire [31:0] pc_add4;
 Adder m_Adder_1(
     .a(pc_curr),
     .b(4),
-    .sum(pc_mult0)
+    .sum(pc_add4)
 );
 
 wire [31:0] inst;
@@ -34,8 +34,8 @@ InstructionMemory m_InstMem(
     .inst(inst)
 );
 
-wire branch, memRead, memtoReg, memWrite, ALUSrc, regWrite;
-wire [1:0] ALUOp;
+wire branch, memRead, memWrite, ALUSrc_A, ALUSrc_B, regWrite, PCSel;
+wire [1:0] ALUOp, memtoReg;
 Control m_Control(
     .opcode(inst[6:0]),
     .branch(branch),
@@ -43,8 +43,10 @@ Control m_Control(
     .memtoReg(memtoReg),
     .ALUOp(ALUOp),
     .memWrite(memWrite),
-    .ALUSrc(ALUSrc),
-    .regWrite(regWrite)
+    .ALUSrc_A(ALUSrc_A),
+    .ALUSrc_B(ALUSrc_B),
+    .regWrite(regWrite),
+    .PCSel(PCSel)
 );
 
 // For Student: 
@@ -88,17 +90,19 @@ Adder m_Adder_2(
     .sum(pc_mult1)
 );
 
-wire zero;
-Mux2to1 #(.size(32)) m_Mux_PC(
-    .sel(branch && zero),
-    .s0(pc_mult0),
-    .s1(pc_mult1),
-    .out(pc_next)
+// Asel
+wire [31:0] ALU_A;
+Mux2to1 #(.size(32)) m_Mux_ALU_A(
+    .sel(ALUSrc_A),
+    .s0(RD1),
+    .s1(pc_curr),
+    .out(ALU_A)
 );
 
+// Bsel
 wire [31:0] ALU_B;
-Mux2to1 #(.size(32)) m_Mux_ALU(
-    .sel(ALUSrc),
+Mux2to1 #(.size(32)) m_Mux_ALU_B(
+    .sel(ALUSrc_B),
     .s0(RD2),
     .s1(imm),
     .out(ALU_B)
@@ -112,13 +116,23 @@ ALUCtrl m_ALUCtrl(
     .ALUCtl(ALUCtl)
 );
 
+wire zero;
 wire [31:0] ALUOut;
 ALU m_ALU(
     .ALUctl(ALUCtl),
-    .A(RD1),
+    .A(ALU_A),
     .B(ALU_B),
     .ALUOut(ALUOut),
     .zero(zero)
+);
+
+// PCSel
+Mux4to1 #(.size(32)) m_Mux_PC(
+    .sel({branch && zero, PCSel}),
+    .s0(pc_add4),
+    .s1(pc_mult1),
+    .s2(ALUOut),
+    .out(pc_next)
 );
 
 wire [31:0] readData;
@@ -132,10 +146,12 @@ DataMemory m_DataMemory(
     .readData(readData)
 );
 
-Mux2to1 #(.size(32)) m_Mux_WriteData(
+// write back to reg
+Mux4to1 #(.size(32)) m_Mux_WriteData(
     .sel(memtoReg),
     .s0(ALUOut),
     .s1(readData),
+    .s2(pc_add4),
     .out(writeDataa)
 );
 
