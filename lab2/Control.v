@@ -30,8 +30,8 @@ module Control (
             end
             // ld
             7'b0000011: begin
-                ALUSrc_A   = 1;
-                ALUSrc_B   = 0;
+                ALUSrc_A   = 0;
+                ALUSrc_B   = 1;
                 memtoReg = 2'b01;
                 regWrite = 1;
                 memRead  = 1;
@@ -43,8 +43,8 @@ module Control (
             end
             // sd
             7'b0100011: begin
-                ALUSrc_A   = 1;
-                ALUSrc_B   = 0;
+                ALUSrc_A   = 0;
+                ALUSrc_B   = 1;
                 memtoReg = 2'bxx;
                 regWrite = 0;
                 memRead  = 0;
@@ -69,8 +69,8 @@ module Control (
             end
             // I-type
             7'b0010011: begin
-                ALUSrc_A   = 1;
-                ALUSrc_B   = 0;
+                ALUSrc_A   = 0;
+                ALUSrc_B   = 1;
                 memtoReg = 2'b00;
                 regWrite = 1;
                 memRead  = 0;

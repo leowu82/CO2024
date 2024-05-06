@@ -2,7 +2,8 @@ module ALU (
     input [3:0] ALUctl,
     input signed [31:0] A,B,
     output reg signed [31:0] ALUOut,
-    output zero
+    output zero,
+    output less_than
 );
     // ALU has two operand, it execute different operator based on ALUctl wire 
     // output zero is for determining taking branch or not (or you can change the design as you wish)
@@ -11,6 +12,7 @@ module ALU (
     // Hint: you can use operator to implement
 
     assign zero = (ALUOut == 0);
+    assign less_than = (ALUOut < 0);
 
     always @(*) begin
         case (ALUctl)

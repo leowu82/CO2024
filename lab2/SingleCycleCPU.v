@@ -83,11 +83,11 @@ ShiftLeftOne m_ShiftLeftOne(
     .o(sl1)
 );
 
-wire [31:0] pc_mult1;
+wire [31:0] pc_addImm;
 Adder m_Adder_2(
     .a(pc_curr),
     .b(sl1),
-    .sum(pc_mult1)
+    .sum(pc_addImm)
 );
 
 // Asel
@@ -116,21 +116,23 @@ ALUCtrl m_ALUCtrl(
     .ALUCtl(ALUCtl)
 );
 
-wire zero;
+wire zero, less_than;
 wire [31:0] ALUOut;
 ALU m_ALU(
     .ALUctl(ALUCtl),
     .A(ALU_A),
     .B(ALU_B),
     .ALUOut(ALUOut),
-    .zero(zero)
+    .zero(zero),
+    .less_than(less_than)
 );
 
 // PCSel
+wire branchSel = branch && ((inst[6:0] == 7'b1101111) || (inst[14:12] == 3'b000 && zero) || (inst[14:12] == 3'b001 && ~zero) || (inst[14:12] == 3'b100 && less_than) || (inst[14:12] == 3'b101 && ~less_than));
 Mux4to1 #(.size(32)) m_Mux_PC(
-    .sel({branch && zero, PCSel}),
+    .sel({PCSel, branchSel}),
     .s0(pc_add4),
-    .s1(pc_mult1),
+    .s1(pc_addImm),
     .s2(ALUOut),
     .out(pc_next)
 );

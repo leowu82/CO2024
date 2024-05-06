@@ -19,6 +19,10 @@ module ImmGen (
             7'b0100011: imm = {{21{inst[31]}}, inst[30:25], inst[11:7]};
             // i-type
             7'b0010011: imm = {{21{inst[31]}}, inst[30:20]};
+            // jar
+            7'b1101111: imm = {{13{inst[31]}}, inst[19:12], inst[20], inst[30:21]};
+            // jalr
+            7'b1100111: imm = {{21{inst[31]}}, inst[30:20]};
             default: imm = 0;
         endcase
     end
