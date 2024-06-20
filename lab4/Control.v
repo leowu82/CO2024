@@ -52,15 +52,15 @@ module Control (
             end
             // beq
             7'b1100011: begin
-                ALUSrc_A   = 1;
-                ALUSrc_B   = 1;
+                ALUSrc_A   = 0;
+                ALUSrc_B   = 0;
                 memtoReg = 2'bxx;
                 regWrite = 0;
                 memRead  = 0;
                 memWrite = 0;
                 branch   = 1;
-                ALUOp[1] = 1;
-                ALUOp[0] = 1;
+                ALUOp[1] = 1'bx;
+                ALUOp[0] = 1'bx;
             end
             // I-type
             7'b0010011: begin
@@ -76,15 +76,15 @@ module Control (
             end
             // jal
             7'b1101111: begin
-                ALUSrc_A   = 1;
+                ALUSrc_A   = 0;
                 ALUSrc_B   = 1;
                 memtoReg = 2'b10;
                 regWrite = 1;
                 memRead  = 0;
                 memWrite = 0;
                 branch   = 1;
-                ALUOp[1] = 1;
-                ALUOp[0] = 1;
+                ALUOp[1] = 1'bx;
+                ALUOp[0] = 1'bx;
             end
             // jalr
             7'b1100111: begin
@@ -95,8 +95,8 @@ module Control (
                 memRead  = 0;
                 memWrite = 0;
                 branch   = 1;
-                ALUOp[1] = 1;
-                ALUOp[0] = 1;
+                ALUOp[1] = 1'bx;
+                ALUOp[0] = 1'bx;
             end
             default: begin
                 ALUSrc_A   = 1'bx;

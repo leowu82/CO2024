@@ -12,15 +12,15 @@ module ImmGen (
             // Hint: follow the RV32I opcode map (table in spec) to set imm value
 
             // beq
-            7'b1100011: imm = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b1};
+            7'b1100011: imm = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0};
             // lw
             7'b0000011: imm = {{21{inst[31]}}, inst[30:20]};
             // sw
             7'b0100011: imm = {{21{inst[31]}}, inst[30:25], inst[11:7]};
             // i-type
             7'b0010011: imm = {{21{inst[31]}}, inst[30:20]};
-            // jar
-            7'b1101111: imm = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b1};
+            // jal
+            7'b1101111: imm = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b0};
             // jalr
             7'b1100111: imm = {{21{inst[31]}}, inst[30:20]};
             default: imm = 0;

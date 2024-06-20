@@ -1,9 +1,9 @@
 .PHONY: part1
 part1:
 	make clean
-	verilator -Wall --cc SingleCycleCPU.v --exe example_testbench.cpp --trace
-	make -C obj_dir -f VSingleCycleCPU.mk VSingleCycleCPU
-	./obj_dir/VSingleCycleCPU
+	verilator -Wall --cc PipelineCPU.v --exe example_testbench.cpp --trace
+	make -C obj_dir -f VPipelineCPU.mk VPipelineCPU
+	./obj_dir/VPipelineCPU
 
 .PHONY: clean
 clean:
