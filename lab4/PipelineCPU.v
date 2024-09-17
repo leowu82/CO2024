@@ -79,11 +79,10 @@ PipelineReg #(.size(64)) m_IF_ID(
 
 // Hazard detect
 HazardDetect HD_Unit(
-    .IFID_opcode(IF_ID[6:0]),
-    .IFID_reg1(IF_ID[19:15]),
-    .IFID_reg2(IF_ID[24:20]),
-    .IDEX_regRd(ID_EX[4:0]),
-    .EXMEM_regRd(EX_MEM[4:0]),
+    .IFID_rs1(IF_ID[19:15]),
+    .IFID_rs2(IF_ID[24:20]),
+    .IDEX_rd(ID_EX[4:0]),
+    .EXMEM_rd(EX_MEM[4:0]),
     .IDEX_memRead(ID_EX[140]),
     .IDEX_regWrite(ID_EX[141]),
     .EXMEM_memRead(EX_MEM[102]),
@@ -144,14 +143,14 @@ ImmGen m_ImmGen(
 
 ForwardingUnit FW_Unit(
     .branch(branch),
-    .IDEX_RD1(ID_EX[155:151]),
-    .IDEX_RD2(ID_EX[150:146]),
-    .IFID_RD1(IF_ID[19:15]),
-    .IFID_RD2(IF_ID[24:20]),
-    .EXMEM_rsW(EX_MEM[4:0]),
-    .MEMWB_WD(MEM_WB[4:0]),
-    .EXMEM_RegWrite(EX_MEM[103]),
-    .MEMWB_RegWrite(MEM_WB[101]),
+    .IFID_rs1(IF_ID[19:15]),
+    .IFID_rs2(IF_ID[24:20]),
+    .IDEX_rs1(ID_EX[155:151]),
+    .IDEX_rs2(ID_EX[150:146]),
+    .EXMEM_rd(EX_MEM[4:0]),
+    .MEMWB_rd(MEM_WB[4:0]),
+    .EXMEM_regWrite(EX_MEM[103]),
+    .MEMWB_regWrite(MEM_WB[101]),
     .Forward_ID_A(Forward_ID_A),
     .Forward_ID_B(Forward_ID_B),
     .ForwardA(ForwardA),
@@ -163,7 +162,7 @@ Mux4to1 #(.size(32)) BranchMuxA(
     .sel(Forward_ID_A),
     .s0(RD1),
     .s1(EX_MEM[68:37]),
-    .s2(MEM_WB[36:5]),
+    .s2(writeDataa),
     .out(RD1_Forward)
 );
 
@@ -171,7 +170,7 @@ Mux4to1 #(.size(32)) BranchMuxB(
     .sel(Forward_ID_B),
     .s0(RD2),
     .s1(EX_MEM[68:37]),
-    .s2(MEM_WB[36:5]),
+    .s2(writeDataa),
     .out(RD2_Forward)
 );
 
@@ -231,7 +230,7 @@ Mux4to1 #(.size(32)) MUX_ForwardA(
     .sel(ForwardA),
     .s0(ID_EX[104:73]), // RD1_Forward
     .s1(EX_MEM[68:37]),  // ALUOut
-    .s2(MEM_WB[36:5]),   // readData (from DMEM)
+    .s2(writeDataa),
     .out(Forward_ALU_A)
 );
 
@@ -240,7 +239,7 @@ Mux4to1 #(.size(32)) MUX_ForwardB(
     .sel(ForwardB),
     .s0(ID_EX[72: 41]),  // RD2_Forward
     .s1(EX_MEM[68:37]),  // ALUOut
-    .s2(MEM_WB[36:5]),   // readData (from DMEM)
+    .s2(writeDataa),
     .out(Forward_ALU_B)
 );
 

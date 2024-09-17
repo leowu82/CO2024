@@ -82,7 +82,7 @@ module Control (
                 regWrite = 1;
                 memRead  = 0;
                 memWrite = 0;
-                branch   = 1;
+                branch   = 0;
                 ALUOp[1] = 1'bx;
                 ALUOp[0] = 1'bx;
             end

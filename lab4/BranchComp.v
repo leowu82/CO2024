@@ -10,11 +10,11 @@ module BranchComp (
     wire less_than = (A - B < 0);
 
     always @(*) begin
-        if (branch) begin
-            // jal
-            if (IFID_opcode == 7'b1101111) PCSel = 1;
+    	// jal
+        if (IFID_opcode == 7'b1101111) PCSel = 1;
+        else if (branch) begin
             // jalr
-            else if (IFID_opcode == 7'b1100111) PCSel = 1;
+            if (IFID_opcode == 7'b1100111) PCSel = 1;
             // beq
             else if (funct3 == 3'b000 && zero) PCSel = 1;
             // bne
